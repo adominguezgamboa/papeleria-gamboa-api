@@ -1,15 +1,20 @@
-const {
-    TIENDANUBE_CLIENT_ID,
-    TIENDANUBE_CLIENT_SECRET,
-    TIENDANUBE_REDIRECT_URI,
-} = process.env;
+require("dotenv").config();
 
 module.exports = {
-    clientId: TIENDANUBE_CLIENT_ID,
-    clientSecret: TIENDANUBE_CLIENT_SECRET,
-    redirectUri: TIENDANUBE_REDIRECT_URI,
+    clientId: process.env.TIENDANUBE_CLIENT_ID || "",
 
-    apiUrl: "https://api.tiendanube.com",
+    clientSecret:
+        process.env.TIENDANUBE_CLIENT_SECRET || "",
 
-    authUrl: "https://www.tiendanube.com/apps",
+    redirectUri:
+        process.env.TIENDANUBE_REDIRECT_URI || "",
+
+    authBaseUrl:
+        "https://www.tiendanube.com/apps",
+
+    tokenUrl:
+        "https://www.tiendanube.com/apps/authorize/token",
+
+    apiBaseUrl:
+        "https://api.tiendanube.com",
 };

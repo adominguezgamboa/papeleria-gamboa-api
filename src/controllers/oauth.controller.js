@@ -1,14 +1,21 @@
+const {
+    clientId,
+    redirectUri,
+} = require("../config/tiendanube.config");
+
 function instalar(req, res) {
+    if (!clientId || !redirectUri) {
+        return res.status(500).json({
+            success: false,
+            message: "Faltan variables de entorno de Tienda Nube.",
+        });
+    }
 
-    return res.status(200).json({
+    const url =
+        `https://www.tiendanube.com/apps/${clientId}/authorize` +
+        `?redirect_uri=${encodeURIComponent(redirectUri)}`;
 
-        success: true,
-
-        message:
-            "OAuth de Tienda Nube preparado.",
-
-    });
-
+    return res.redirect(url);
 }
 
 module.exports = {
