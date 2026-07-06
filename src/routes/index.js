@@ -2,6 +2,7 @@ const express = require("express");
 
 const healthRoutes = require("./health.routes");
 const oauthRoutes = require("./oauth.routes");
+const privacyRoutes = require("./privacy.routes");
 
 const router = express.Router();
 
@@ -20,5 +21,13 @@ router.use("/", healthRoutes);
 */
 
 router.use("/", oauthRoutes);
+
+/*
+|--------------------------------------------------------------------------
+| Privacy Webhooks
+|--------------------------------------------------------------------------
+*/
+
+router.use("/", privacyRoutes);
 
 module.exports = router;
