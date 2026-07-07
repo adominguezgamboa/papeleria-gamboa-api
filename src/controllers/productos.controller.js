@@ -1,28 +1,24 @@
-const { obtenerProductos } = require("../services/tiendanube.service");
-
-const ACCESS_TOKEN =
-    process.env.TIENDANUBE_ACCESS_TOKEN;
-
-const USER_ID =
-    process.env.TIENDANUBE_USER_ID;
+const { obtenerStore } = require("../repositories/store.repository");
+const {
+    obtenerProductos,
+} = require("../services/productos.service");
 
 async function listar(req, res) {
 
     try {
 
-        if (!ACCESS_TOKEN || !USER_ID) {
-            return res.status(500).json({
+        const store = await obtenerStore();
+
+        if (!store) {
+            return res.status(404).json({
                 success: false,
-                message: "Faltan variables TIENDANUBE_ACCESS_TOKEN o TIENDANUBE_USER_ID.",
+                message: "No hay ninguna tienda conectada.",
             });
         }
 
-        const productos = await obtenerProductos(
-            ACCESS_TOKEN,
-            USER_ID
-        );
+        const productos = await obtenerProductos(store);
 
-        return res.json({
+        return res.status(200).json({
             success: true,
             total: productos.length,
             productos,
@@ -34,7 +30,7 @@ async function listar(req, res) {
 
         return res.status(500).json({
             success: false,
-            message: "Error obteniendo productos.",
+            message: "Error obteniendo productos de Tienda Nube.",
             error: error.response?.data || error.message,
         });
 
