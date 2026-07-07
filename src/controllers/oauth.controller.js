@@ -1,6 +1,5 @@
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+const prisma = require("../config/prisma");
 
 const {
     clientId,
@@ -10,55 +9,53 @@ const {
 } = require("../config/tiendanube.config");
 
 function instalar(req, res) {
-
     const url =
         `https://www.tiendanube.com/apps/${clientId}/authorize` +
         `?redirect_uri=${encodeURIComponent(redirectUri)}`;
 
     return res.redirect(url);
-
 }
 
 async function callback(req, res) {
-
     try {
-
         const { code } = req.query;
 
         if (!code) {
-
             return res.status(400).json({
                 success: false,
                 message: "No se recibió el código OAuth.",
             });
-
         }
 
-        const { data } = await axios.post(
-            tokenUrl,
-            {
-                client_id: clientId,
-                client_secret: clientSecret,
-                grant_type: "authorization_code",
-                code,
-            }
-        );
+        const { data } = await axios.post(tokenUrl, {
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: "authorization_code",
+            code,
+        });
 
-        const carpeta = path.join(
-            __dirname,
-            "..",
-            "..",
-            "storage"
-        );
+        await prisma.store.upsert({
+            where: {
+                storeId: data.user_id,
+            },
+            update: {
+                accessToken: data.access_token,
+                scope: data.scope,
+                tokenType: data.token_type,
+            },
+            create: {
+                storeId: data.user_id,
+                userId: data.user_id,
+                accessToken: data.access_token,
+                scope: data.scope,
+                tokenType: data.token_type,
+            },
+        });
 
-        if (!fs.existsSync(carpeta)) {
-            fs.mkdirSync(carpeta);
-        }
-
-        fs.writeFileSync(
-            path.join(carpeta, "tiendanube.json"),
-            JSON.stringify(data, null, 4)
-        );
+        console.log("================================");
+        console.log("TIENDA GUARDADA");
+        console.log(data);
+        console.log("================================");
 
         return res.json({
             success: true,
@@ -67,20 +64,14 @@ async function callback(req, res) {
 
     } catch (error) {
 
-        console.error(
-            error.response?.data || error.message
-        );
+        console.error(error.response?.data || error);
 
         return res.status(500).json({
             success: false,
-            message: "Error obteniendo Access Token.",
-            error:
-                error.response?.data ??
-                error.message,
+            message: "Error durante OAuth.",
+            error: error.response?.data || error.message,
         });
-
     }
-
 }
 
 module.exports = {
