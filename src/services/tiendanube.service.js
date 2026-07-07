@@ -1,16 +1,25 @@
 const axios = require("axios");
 
 const {
-    apiUrl,
+    apiBaseUrl,
 } = require("../config/tiendanube.config");
 
-const cliente = axios.create({
-    baseURL: apiUrl,
-    timeout: 15000,
-    headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-    },
-});
+async function obtenerProductos(accessToken, userId) {
 
-module.exports = cliente;
+    const { data } = await axios.get(
+        `${apiBaseUrl}/2025-03/${userId}/products`,
+        {
+            headers: {
+                Authentication: `bearer ${accessToken}`,
+                "User-Agent": "Papelería Gamboa App (adominguez@papeleriagamboa.com.mx)",
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    return data;
+}
+
+module.exports = {
+    obtenerProductos,
+};
