@@ -34,28 +34,26 @@ async function callback(req, res) {
             code,
         });
 
+        console.log("TOKEN RECIBIDO:", data);
+
         await prisma.store.upsert({
             where: {
-                storeId: data.user_id,
+                storeId: String(data.user_id),
             },
             update: {
-                accessToken: data.access_token,
-                scope: data.scope,
-                tokenType: data.token_type,
-            },
-            create: {
-                storeId: data.user_id,
                 userId: data.user_id,
                 accessToken: data.access_token,
                 scope: data.scope,
-                tokenType: data.token_type,
+            },
+            create: {
+                storeId: String(data.user_id),
+                userId: data.user_id,
+                accessToken: data.access_token,
+                scope: data.scope,
             },
         });
 
-        console.log("================================");
-        console.log("TIENDA GUARDADA");
-        console.log(data);
-        console.log("================================");
+        console.log("TIENDA GUARDADA EN POSTGRESQL");
 
         return res.json({
             success: true,
@@ -64,12 +62,13 @@ async function callback(req, res) {
 
     } catch (error) {
 
-        console.error(error.response?.data || error);
+        console.error("ERROR OAUTH:");
+        console.error(error);
 
         return res.status(500).json({
             success: false,
             message: "Error durante OAuth.",
-            error: error.response?.data || error.message,
+            error: error.message,
         });
     }
 }
