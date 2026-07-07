@@ -1,5 +1,5 @@
 const express = require("express");
-
+const storeRoutes = require("./store.routes");
 const healthRoutes = require("./health.routes");
 const oauthRoutes = require("./oauth.routes");
 const privacyRoutes = require("./privacy.routes");
@@ -38,5 +38,6 @@ router.use("/", privacyRoutes);
 */
 
 router.use("/", productosRoutes);
+router.use("/", storeRoutes);
 
 module.exports = router;
